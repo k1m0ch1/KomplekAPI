@@ -19,7 +19,7 @@ def send_messages():
         message = template.replace("{nama}", name).replace("{nomor_rumah}", rumah)
 
         status, resp = send_whatsapp_message(phone, message)
-        results.append({"to": phone, "status": status, "response": resp})
+        results.append({"to": f"{phone}@s.whatsapp.net", "status": status, "response": resp})
 
     return {"sent_count": len(results), "details": results}
 

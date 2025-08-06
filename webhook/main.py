@@ -75,30 +75,38 @@ async def webhook_handler(
     #    raise HTTPException(status_code=401, detail="Invalid signature")
 
     payload = json.loads(body)
-    event = payload.get("event")
+    event = payload.get("event")   
 
     print(payload)
+    print(payload["image"])
 
-    image = payload.get("image")
-    image_caption = image.get("caption")
-    sender = payload.get("sender")
+    image = payload["image"]
+    image_caption = image["caption"] if image else None
+    sender = payload["sender"] 
     #file_url = payload.get("file_url")  # ← GOWA webhook includes this for media
-    file_url = image.get("media_path")
+    file_url = image["media_path"] if image else None
 
     parsed = parse_iplnotif(image_caption)
     if parsed and file_url:
         blok, bulan, tahun = parsed
 
         # Download the media (e.g., image)
-        media_resp = requests.get(file_url, auth=(GOWA_USERNAME, GOWA_PASSWORD))
-        if media_resp.status_code == 200:
-            filename = f"{blok}-{bulan}-{tahun}.jpg"
-            key = f"{tahun}/{bulan}/{filename}"
-            upload_to_r2(media_resp.content, key)
+        # media_resp = requests.get(file_url, auth=(GOWA_USERNAME, GOWA_PASSWORD))
 
-            # Reply to sender
-            reply_message(sender, "Terima kasih, sudah membayar, bukti pembayaran akan kami cek dan akan di konfirmasi")
-            return {"status": "uploaded and replied"}
+        try:
+            with open(file_url, "rb") as f:
+            file_bytes = f.read()
+        except FileNotFoundError:
+            print(f"⚠ File not found: {file_url}")
+            return {"status": "file not found"}
+
+        filename = f"{blok}-{bulan}-{tahun}.jpg"
+        key = f"{tahun}/{bulan}/{filename}"
+        upload_to_r2(file_bytes, key)
+
+        # Reply to sender
+        reply_message(sender, "Terima kasih, sudah membayar, bukti pembayaran akan kami cek dan akan di konfirmasi")
+        return {"status": "uploaded and replied"}
 
     return {"status": "received"}
 
