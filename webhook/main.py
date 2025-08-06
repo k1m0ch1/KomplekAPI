@@ -51,7 +51,7 @@ def upload_to_r2(file_bytes: bytes, key: str):
 
 def reply_message(to: str, message: str):
     payload = {
-        "receiver": to,
+        "phone": to,
         "message": message
     }
     response = requests.post(
