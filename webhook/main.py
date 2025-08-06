@@ -89,7 +89,6 @@ async def webhook_handler(
     event = payload.get("event")   
 
     print(payload)
-    print(payload["image"])
 
     if "image" in payload:
 
