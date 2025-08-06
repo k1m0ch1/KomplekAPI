@@ -7,6 +7,7 @@ import boto3
 import requests
 from io import BytesIO
 import config as cfg 
+from datetime import datetime
 
 app = FastAPI()
 
@@ -16,6 +17,7 @@ S3_BUCKET_NAME = cfg.R2_BUCKET_NAME
 GOWA_API = cfg.GOWA_BASE 
 GOWA_USERNAME = cfg.GOWA_USERNAME 
 GOWA_PASSWORD = cfg.GOWA_PASSWORD
+R2_PUBLIC = cfg.R2_PUBLIC
 
 # Configure boto3 for R2
 s3 = boto3.client(
@@ -108,6 +110,17 @@ async def webhook_handler(
                 filename = f"{blok}-{bulan}-{tahun}.jpg"
                 key = f"{tahun}/{bulan}/{filename}"
                 upload_to_r2(media_resp.content, key)
+                public_url = f"{cfg.R2_PUBLIC}/{key}/{filename}"
+
+                row = {
+                    "transfered_at": datetime.now().strftime("%Y-%m-%d"),
+                    "Nomor Rumah": blok,
+                    "Bukti Bayar": public_url,
+                    "dibayarkan oleh": sender,
+                }
+
+                stein_response = requests.post(f"{cfg.STEIN_BASE}/tagihan", json=[row], auth=cfg.STEIN_AUTH)
+                print("📄 Stein insert status:", stein_response.status_code, stein_response.text)
     
                 # Reply to sender
                 reply_message(sender, "Terima kasih, sudah membayar, bukti pembayaran akan kami cek dan akan di konfirmasi")
