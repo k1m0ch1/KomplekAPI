@@ -55,7 +55,7 @@ def reply_message(to: str, message: str):
         "message": message
     }
     response = requests.post(
-        f"{GOWA_API}/send-message",
+        f"{GOWA_API}/send/message",
         auth=(GOWA_USERNAME, GOWA_PASSWORD),
         json=payload
     )
