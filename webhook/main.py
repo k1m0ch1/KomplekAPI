@@ -77,14 +77,18 @@ async def webhook_handler(
     payload = json.loads(body)
     event = payload.get("event")
 
+    print(payload)
+
     if event != "message_received":
         return {"status": "ignored"}
 
-    message = payload.get("message")
+    image = payload.get("image")
+    image_caption = image.get("caption")
     sender = payload.get("sender")
-    file_url = payload.get("file_url")  # ← GOWA webhook includes this for media
+    #file_url = payload.get("file_url")  # ← GOWA webhook includes this for media
+    file_url = image.get("media_path")
 
-    parsed = parse_iplnotif(message)
+    parsed = parse_iplnotif(image_caption)
     if parsed and file_url:
         blok, bulan, tahun = parsed
 
