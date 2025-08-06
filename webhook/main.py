@@ -79,9 +79,6 @@ async def webhook_handler(
 
     print(payload)
 
-    if event != "message_received":
-        return {"status": "ignored"}
-
     image = payload.get("image")
     image_caption = image.get("caption")
     sender = payload.get("sender")
