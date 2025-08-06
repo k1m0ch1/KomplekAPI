@@ -102,18 +102,11 @@ async def webhook_handler(
         blok, bulan, tahun = parsed
 
         # Download the media (e.g., image)
-        # media_resp = requests.get(file_url, auth=(GOWA_USERNAME, GOWA_PASSWORD))
-
-        try:
-            with open(file_url, "rb") as f:
-                file_bytes = f.read()
-        except FileNotFoundError:
-            print(f"⚠ File not found: {file_url}")
-            return {"status": "file not found"}
-
-        filename = f"{blok}-{bulan}-{tahun}.jpg"
-        key = f"{tahun}/{bulan}/{filename}"
-        upload_to_r2(file_bytes, key)
+        media_resp = requests.get(file_url)
+        if media_resp.status_code == 200:
+            filename = f"{blok}-{bulan}-{tahun}.jpg"
+            key = f"{tahun}/{bulan}/{filename}"
+            upload_to_r2(media_resp.content, key)
 
         # Reply to sender
         reply_message(sender, "Terima kasih, sudah membayar, bukti pembayaran akan kami cek dan akan di konfirmasi")
