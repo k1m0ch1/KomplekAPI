@@ -110,7 +110,7 @@ async def webhook_handler(
                 filename = f"{blok}-{bulan}-{tahun}.jpg"
                 key = f"{tahun}/{bulan}/{filename}"
                 upload_to_r2(media_resp.content, key)
-                public_url = f"{cfg.R2_PUBLIC}/{key}/{filename}"
+                public_url = f"{cfg.R2_PUBLIC}/{key}"
 
                 row = {
                     "transfered_at": datetime.now().strftime("%Y-%m-%d"),
