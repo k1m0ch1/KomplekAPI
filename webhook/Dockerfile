@@ -9,11 +9,12 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install pip dependencies
-COPY requirements.txt .
+COPY ../requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the app source code
 COPY . .
+COPY ../config.py ./config.py
 
 # Expose port for FastAPI
 EXPOSE 8080
