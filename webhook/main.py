@@ -91,25 +91,27 @@ async def webhook_handler(
     print(payload)
     print(payload["image"])
 
-    image = payload["image"]
-    image_caption = image["caption"] if image else None
-    sender = payload["sender_id"] 
-    #file_url = payload.get("file_url")  # ← GOWA webhook includes this for media
-    file_url = image["media_path"] if image else None
+    if "image" in payload:
 
-    parsed = parse_iplnotif(image_caption)
-    if parsed and file_url:
-        blok, bulan, tahun = parsed
+        image = payload["image"]
+        image_caption = image["caption"] if image else None
+        sender = payload["sender_id"] 
+        #file_url = payload.get("file_url")  # ← GOWA webhook includes this for media
+        file_url = image["media_path"] if image else None
 
-        # Download the media (e.g., image)
-        media_resp = requests.get(f"{GOWA_API}/{file_url}")
-        if media_resp.status_code == 200:
-            filename = f"{blok}-{bulan}-{tahun}.jpg"
-            key = f"{tahun}/{bulan}/{filename}"
-            upload_to_r2(media_resp.content, key)
-
-        # Reply to sender
-        reply_message(sender, "Terima kasih, sudah membayar, bukti pembayaran akan kami cek dan akan di konfirmasi")
+        parsed = parse_iplnotif(image_caption)
+        if parsed and file_url:
+            blok, bulan, tahun = parsed
+    
+            # Download the media (e.g., image)
+            media_resp = requests.get(f"{GOWA_API}/{file_url}")
+            if media_resp.status_code == 200:
+                filename = f"{blok}-{bulan}-{tahun}.jpg"
+                key = f"{tahun}/{bulan}/{filename}"
+                upload_to_r2(media_resp.content, key)
+    
+                # Reply to sender
+                reply_message(sender, "Terima kasih, sudah membayar, bukti pembayaran akan kami cek dan akan di konfirmasi")
         return {"status": "uploaded and replied"}
 
     return {"status": "received"}
