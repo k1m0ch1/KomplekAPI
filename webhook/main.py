@@ -34,12 +34,23 @@ def verify_signature(body: bytes, signature: str) -> bool:
     expected = mac.hexdigest()
     return hmac.compare_digest(expected, signature)
 
-
 def parse_iplnotif(text: str):
-    match = re.match(r"IPL\s+(\w+)\s+bulan\s+([A-Za-z]+)\s+tahun\s+(\d{4})", text, re.IGNORECASE)
-    if match:
-        return match.groups()  # (blok, bulan, tahun)
-    return None
+    try:
+        parts = text.lower().strip().split()
+        if parts[0] != "ipl":
+            return None
+
+        blok = parts[1]
+        bulan_index = parts.index("bulan")
+        tahun_index = parts.index("tahun")
+
+        bulan = parts[bulan_index + 1]
+        tahun = parts[tahun_index + 1]
+
+        return blok.upper(), bulan.capitalize(), tahun
+    except (ValueError, IndexError):
+        return None
+
 
 def upload_to_r2(file_bytes: bytes, key: str):
     s3.put_object(
