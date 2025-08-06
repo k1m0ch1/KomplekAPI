@@ -102,7 +102,7 @@ async def webhook_handler(
         blok, bulan, tahun = parsed
 
         # Download the media (e.g., image)
-        media_resp = requests.get(file_url)
+        media_resp = requests.get(f"{GOWA_API}/{file_url}")
         if media_resp.status_code == 200:
             filename = f"{blok}-{bulan}-{tahun}.jpg"
             key = f"{tahun}/{bulan}/{filename}"
