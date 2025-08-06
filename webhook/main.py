@@ -95,7 +95,7 @@ async def webhook_handler(
 
         try:
             with open(file_url, "rb") as f:
-            file_bytes = f.read()
+                file_bytes = f.read()
         except FileNotFoundError:
             print(f"⚠ File not found: {file_url}")
             return {"status": "file not found"}
