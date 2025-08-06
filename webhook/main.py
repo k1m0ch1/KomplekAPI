@@ -82,7 +82,7 @@ async def webhook_handler(
 
     image = payload["image"]
     image_caption = image["caption"] if image else None
-    sender = payload["sender"] 
+    sender = payload["sender_id"] 
     #file_url = payload.get("file_url")  # ← GOWA webhook includes this for media
     file_url = image["media_path"] if image else None
 
