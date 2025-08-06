@@ -27,9 +27,13 @@ s3 = boto3.client(
 )
 
 def verify_signature(body: bytes, signature: str) -> bool:
+    if signature is None:
+        raise HTTPException(status_code=400, detail="Missing signature header: X-Hub-Signature")
+
     mac = hmac.new(WEBHOOK_SECRET, msg=body, digestmod=hashlib.sha256)
     expected = mac.hexdigest()
     return hmac.compare_digest(expected, signature)
+
 
 def parse_iplnotif(text: str):
     match = re.match(r"IPL\s+(\w+)\s+bulan\s+([A-Za-z]+)\s+tahun\s+(\d{4})", text, re.IGNORECASE)
@@ -63,6 +67,9 @@ async def webhook_handler(
     x_hub_signature: str = Header(default=None)
 ):
     body = await request.body()
+
+    if x_hub_signature is None:
+        raise HTTPException(status_code=400, detail="Missing X-Hub-Signature header")
 
     if not verify_signature(body, x_hub_signature):
         raise HTTPException(status_code=401, detail="Invalid signature")
